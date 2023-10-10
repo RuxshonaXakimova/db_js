@@ -96,10 +96,9 @@ function reload(arr) {
 
         btn.onclick = () => {
             if (!btn.classList.contains('selected')) {
-                selected_products_count++
-                section_h1.innerHTML = `В корзине: ${selected_products_count} товар`
-
+                // selected_products_count++
                 busket.push(item.id)
+                section_h1.innerHTML = `В корзине: ${busket.length} товар`
                 btn.classList.add('selected')
                 btn.innerHTML = "Добавлено"
                 selected_btns.push(btn)
@@ -107,7 +106,10 @@ function reload(arr) {
             } else {
                 btn.classList.remove('selected')
                 btn.innerHTML = "В избранное"
+                // selected_products_count--
                 busket = busket.filter(id => id !== item.id)
+                section_h1.innerHTML = `В корзине: ${busket.length} товар`
+                
             }
             busket_reload(busket)
         }
@@ -196,6 +198,7 @@ function busket_reload(ids_arr) {
         button_remove.onclick = () => {
             main_item.remove()
             busket = busket.filter(id => id !== item.id)
+            section_h1.innerHTML = `В корзине: ${busket.length} товар`
             selected_btns.forEach(btn => {
                 btn.classList.remove('selected')
                 btn.innerHTML = "В избранное"
@@ -206,6 +209,7 @@ function busket_reload(ids_arr) {
                     if (btn.id == num) {
                         btn.classList.add('selected')
                         btn.innerHTML = "Добавлено"
+                        
                     }
                 })
 
