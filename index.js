@@ -8,17 +8,23 @@ let modal_opener = document.querySelector('.modal_opener')
 let modal_close = document.querySelector('.modal_close')
 let scrolable = document.querySelector('.scrolable')
 
-let mainDiv_arr = []
 
-let selected_products_count = 0
+
+
+// let selected_products_count = 0
 let busket = []
-let selected_btns = []
-let allbtns = []
+// let selected_btns = []
+// let allbtns = []
 
-reload(arr)
+function calculateBusket() {
+    section_h1.innerHTML = `You have <b>${busket.length}</b> elements in busket`;
+}
+calculateBusket()
+reload(arr);
 
 
 function reload(arr) {
+    wrap.innerHTML = ""
     for (let item of arr) {
         let mainDiv = doc.createElement('div')
         let mainImg = doc.createElement('img')
@@ -51,6 +57,13 @@ function reload(arr) {
         box1p.classList.add('boxP')
         box2p.classList.add('boxP')
         box3p.classList.add('boxP')
+        btn.innerHTML = "В избранное"
+
+        if (busket.includes(item.id)) {
+            btn.classList.add("selected");
+            btn.innerHTML = "Добавлено"
+        }
+
         btn.classList.add('btn')
         box1img.classList.add('boxImg')
         box2img.classList.add('boxImg')
@@ -66,9 +79,11 @@ function reload(arr) {
         box1p.innerHTML = item.price
         box2p.innerHTML = item.rating.rate
         box3p.innerHTML = item.rating.count
-        btn.innerHTML = "В избранное"
-        btn.setAttribute("id", item.id)
-        allbtns.push(btn)
+
+        // btn.setAttribute("id", item.id)
+        // allbtns.push(btn)
+
+
 
 
         wrap.append(mainDiv)
@@ -80,37 +95,45 @@ function reload(arr) {
         bottomDivBox3.append(box3img, box3p)
 
 
-        mainDiv_arr.push(mainDiv)
 
-        btn_first_five.onclick = () => {
-            for (i = 5; i <= mainDiv_arr.length; i++) {
-                mainDiv_arr[i].classList.add('none')
-            }
-        }
 
-        btn_show_all.onclick = () => {
-            mainDiv_arr.forEach(div => {
-                div.classList.contains('none') ? div.classList.remove('none') : null
-            })
-        }
+        // btn.onclick = () => {
+        //     if (!btn.classList.contains('selected')) {
+        //         // selected_products_count++
+        //         busket.push(item.id)
+        //         section_h1.innerHTML = `В корзине: ${busket.length} товар`
+        //         btn.classList.add('selected')
+        //         btn.innerHTML = "Добавлено"
+        //         selected_btns.push(btn)
+
+        //     } else {
+        //         btn.classList.remove('selected')
+        //         btn.innerHTML = "В избранное"
+        //         // selected_products_count--
+        //         busket = busket.filter(id => id !== item.id)
+        //         section_h1.innerHTML = `В корзине: ${busket.length} товар`
+
+        //     }
+        //     busket_reload(busket)
+        // }
 
         btn.onclick = () => {
-            if (!btn.classList.contains('selected')) {
-                // selected_products_count++
-                busket.push(item.id)
-                section_h1.innerHTML = `В корзине: ${busket.length} товар`
-                btn.classList.add('selected')
-                btn.innerHTML = "Добавлено"
-                selected_btns.push(btn)
 
-            } else {
+            if (busket.includes(item.id)) {
+                // delete
+                // let idx = busket.indexOf(item.id)
+                // busket.splice(idx, 1)
+
+                busket = busket.filter(id => id !== item.id)
+
                 btn.classList.remove('selected')
                 btn.innerHTML = "В избранное"
-                // selected_products_count--
-                busket = busket.filter(id => id !== item.id)
-                section_h1.innerHTML = `В корзине: ${busket.length} товар`
-                
+            } else {
+                busket.push(item.id)
+                btn.classList.add('selected')
+                btn.innerHTML = "Добавлено"
             }
+            calculateBusket()
             busket_reload(busket)
         }
 
@@ -122,6 +145,7 @@ busket_reload(busket)
 function busket_reload(ids_arr) {
     scrolable.innerHTML = ""
     let temp = []
+    let allProducts = 0
 
 
     for (let item of arr) {
@@ -132,6 +156,29 @@ function busket_reload(ids_arr) {
         }
 
     }
+
+    let total_price = 0
+
+    
+
+    let overall_main = document.createElement('div')
+    let overall_top = document.createElement('div')
+    let overall_p = document.createElement('p')
+    let overall_h3 = document.createElement('h3')
+    let overall_button = document.createElement('button')
+
+    overall_main.classList.add('overall_main')
+    overall_top.classList.add('overall_top')
+    overall_p.innerHTML = "Total:"
+    total_price = +total_price.toFixed(2)
+    overall_h3.innerHTML = `$${total_price}`
+    overall_button.innerHTML = "Order"
+
+
+
+    modal.append(overall_main)
+    overall_main.append(overall_top, overall_button)
+    overall_top.append(overall_p, overall_h3)
 
     for (let item of temp) {
 
@@ -168,9 +215,10 @@ function busket_reload(ids_arr) {
         p_plus.classList.add('p_plus')
         p_plus.innerHTML = "+"
         p_price.classList.add('p_price')
-        p_price.innerHTML = `$${item.price}`
+        p_price.innerHTML = item.price
         button_remove.classList.add('button_remove')
         button_remove.innerHTML = "remove"
+
 
 
         scrolable.append(main_item)
@@ -181,42 +229,63 @@ function busket_reload(ids_arr) {
         item_right.append(count, p_price, button_remove)
         count.append(p_minus, p_num, p_plus)
 
+       
         p_plus.onclick = () => {
             numcount++
             p_num.innerHTML = numcount
-            p_price.innerHTML = `$${numcount * item.price}`
+            p_price.innerHTML = `$${(numcount * item.price).toFixed(2)}`
+            total_price += item.price
+            // total_price = +total_price.toFixed(2)
+            overall_h3.innerHTML = `$${total_price.toFixed(2)}`
         }
 
         p_minus.onclick = () => {
             if (numcount !== 1) {
                 numcount--
                 p_num.innerHTML = numcount
-                p_price.innerHTML = `$${numcount * item.price}`
+                let c = 
+                p_price.innerHTML = `$${(numcount * item.price).toFixed(2)}`
+                total_price -= item.price
+                // total_price = +total_price.toFixed(2)
+                overall_h3.innerHTML = `$${total_price.toFixed(2)}`
             }
         }
 
+        
+        total_price += item.price
+        total_price = +total_price.toFixed(2)
+
         button_remove.onclick = () => {
-            main_item.remove()
             busket = busket.filter(id => id !== item.id)
-            section_h1.innerHTML = `В корзине: ${busket.length} товар`
-            selected_btns.forEach(btn => {
-                btn.classList.remove('selected')
-                btn.innerHTML = "В избранное"
-            })
-
-            selected_btns.forEach(btn => {
-                busket.forEach(num => {
-                    if (btn.id == num) {
-                        btn.classList.add('selected')
-                        btn.innerHTML = "Добавлено"
-                        
-                    }
-                })
-
-            })
+            main_item.remove()
+            total_price = total_price-(numcount*item.price)
+            // total_price = total_price-(numcount*item.price)
+            overall_h3.innerHTML = `$${total_price.toFixed(2)}`
+            reload(arr)
+            calculateBusket()
 
         }
+        total_price = +total_price.toFixed(2)
+        overall_h3.innerHTML = `$${total_price}`
+        
     }
+
+    
+
+
+
+}
+
+btn_first_five.onclick = () => {
+    reload(
+        arr.slice(0, 5)
+    )
+}
+
+btn_show_all.onclick = () => {
+    reload(
+        arr
+    )
 }
 
 
